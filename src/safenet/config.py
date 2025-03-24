@@ -32,7 +32,8 @@ class WebTargetConfig(BaseModel):
 class AppConfig(BaseModel):
     """Application configuration for safenet."""
 
-    targets: list[WebTargetConfig] = []
+    websites: list[WebTargetConfig] = []
+
     logging: dict | None = None
 
     @classmethod

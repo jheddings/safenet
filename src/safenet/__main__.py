@@ -24,12 +24,12 @@ class MainApp:
 
         unsafe = 0
 
-        for target in self.config.targets:
+        for target in self.config.websites:
             self.logger.info("checking target: %s", target.name)
 
             web = target.initialize()
 
-            if not web.is_safe():
+            if not web.check():
                 unsafe += 1
 
         self.logger.info("safenet - scan complete")

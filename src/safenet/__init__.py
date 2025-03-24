@@ -6,6 +6,8 @@ import requests
 
 log = logging.getLogger(__name__)
 
+# TODO add support for known "safe" websites (verify they are reachable)
+
 
 class WebTarget:
     """A target host for network operations."""
@@ -16,18 +18,16 @@ class WebTarget:
 
         self.log = log.getChild("WebTarget")
 
-    def is_safe(self):
+    def check(self):
         """Verify HTTP connectivity is blocked to the web target."""
 
         self.log.debug("verify [%s] => %s", self.name, self.address)
 
-        try:
-            resp = requests.head(self.address)
-            resp.raise_for_status()
-        except requests.RequestException:
-            self.log.info("[%s] marked as safe", self.name)
-            return True
+        resp = requests.head(self.address)
 
-        self.log.warning("[%s] is not safe", self.name)
+        if resp.ok:
+            self.log.warning("[%s] is not safe", self.name)
+            return False
 
-        return False
+        self.log.info("[%s] marked as safe", self.name)
+        return True
