@@ -11,7 +11,7 @@ import os.path
 import yaml
 from pydantic import BaseModel
 
-from . import WebTarget
+from .targets import WebTarget
 
 logger = logging.getLogger(__name__)
 
