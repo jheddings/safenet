@@ -1,4 +1,4 @@
-# Makefile for pingdat
+# Makefile for safenet
 
 BASEDIR ?= $(PWD)
 SRCDIR ?= $(BASEDIR)/src
@@ -45,7 +45,7 @@ release: preflight
 
 .PHONY: run
 run: venv
-	$(WITH_VENV) python3 -m pingdat --config $(BASEDIR)/local.yaml
+	$(WITH_VENV) python3 -m safenet --config $(BASEDIR)/local.yaml
 
 
 .PHONY: runc

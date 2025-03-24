@@ -1,0 +1,52 @@
+[project]
+name = "safenet"
+version = "0.1.0"
+description = "Scan explicit and malilcious sites to verify content filters."
+authors = [
+    { name="jheddings", email="jheddings@gmail.com" }
+]
+license = "MIT"
+#readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic (>=2.10.6,<3.0.0)",
+    "requests (>=2.32.3,<3.0.0)"
+]
+
+[tool.poetry.scripts]
+safenet = "safenet.__main__:main"
+
+[tool.poetry.group.dev.dependencies]
+gitpython = "^3.1.44"
+pre-commit = "^4.2.0"
+ruff = "^0.11.2"
+black = "^25.1.0"
+isort = "^6.0.1"
+pytest = "^8.3.5"
+
+[tool.black]
+line_length = 88
+
+[tool.isort]
+profile = "black"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "C",   # flake8-comprehensions
+    "B",   # flake8-bugbear
+    "G",   # flake8-logging-format
+    "RET", # flake8-return
+    "N",   # pep8-naming
+    "ERA", # eradicate
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501", # line-too-long
+]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
