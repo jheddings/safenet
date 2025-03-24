@@ -7,22 +7,21 @@ import click
 from . import version
 from .config import AppConfig
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class MainApp:
     """Context used during main execution."""
 
     def __init__(self, config: AppConfig):
-        self.logger = logger.getChild("MainApp")
-
         self.config = config
+        self.logger = log.getChild("MainApp")
 
     def __call__(self):
         """Run the main application."""
         self.logger.info("starting scan")
 
-        unsafe = 0
+        failed = 0
 
         for target in self.config.websites:
             self.logger.info("checking target: %s", target.name)
@@ -30,12 +29,12 @@ class MainApp:
             web = target.initialize()
 
             if not web.check():
-                unsafe += 1
+                failed += 1
 
         self.logger.info("scan complete")
 
-        if unsafe > 0:
-            raise SystemExit(unsafe)
+        if failed > 0:
+            raise SystemExit(failed)
 
 
 @click.command()

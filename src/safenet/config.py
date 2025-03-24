@@ -11,7 +11,7 @@ import os.path
 import yaml
 from pydantic import BaseModel
 
-from .targets import WebTarget
+from .targets import SafeWebsite, UnsafeWebsite
 
 logger = logging.getLogger(__name__)
 
@@ -21,12 +21,16 @@ class WebTargetConfig(BaseModel):
 
     name: str
     address: str
+    safe: bool = False
 
     def initialize(self):
         """Initialize the web target for use."""
         logger.info("initializing target: %s", self.name)
 
-        return WebTarget(self.name, self.address)
+        if self.safe:
+            return SafeWebsite(self.name, self.address)
+
+        return UnsafeWebsite(self.name, self.address)
 
 
 class AppConfig(BaseModel):
