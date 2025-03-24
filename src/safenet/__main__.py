@@ -35,7 +35,7 @@ class MainApp:
         self.logger.info("safenet - scan complete")
 
         if unsafe > 0:
-            raise SystemExit(-1)
+            raise SystemExit(unsafe)
 
 
 @click.command()
