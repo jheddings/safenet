@@ -20,7 +20,7 @@ class MainApp:
 
     def __call__(self):
         """Run the main application."""
-        self.logger.info("safenet - starting scan")
+        self.logger.info("starting scan")
 
         unsafe = 0
 
@@ -32,7 +32,7 @@ class MainApp:
             if not web.check():
                 unsafe += 1
 
-        self.logger.info("safenet - scan complete")
+        self.logger.info("scan complete")
 
         if unsafe > 0:
             raise SystemExit(unsafe)
