@@ -1,0 +1,40 @@
+## sample config file for safenet
+---
+
+websites:
+
+  - name: Google
+    address: "https://www.google.com"
+    safe: true
+
+  - name: Pornhub
+    address: "https://www.pornhub.com"
+    safe: false
+
+
+logging:
+  version: 1
+
+  formatters:
+    brief:
+      format: '%(message)s'
+    short:
+      format: '%(levelname)s:%(name)s:%(message)s'
+    precise:
+      format: '%(asctime)s %(levelname)-8s %(threadName)s %(name)s %(message)s'
+      datefmt: '%Y-%m-%d %H:%M:%S'
+
+  root:
+    level: INFO
+    handlers: [console]
+
+  handlers:
+    console:
+      class: logging.StreamHandler
+      formatter: precise
+      stream: ext://sys.stdout
+    logfile:
+      class: logging.FileHandler
+      formatter: precise
+      filename: safenet.log
+      mode: w
