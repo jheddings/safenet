@@ -24,6 +24,23 @@ class WebsiteTarget(BaseTarget, ABC):
         self.name = name
         self.address = address
 
+    @property
+    def is_available(self):
+        """Determine if the current website is available."""
+
+        self.logger.debug("verify [%s] => %s", self.name, self.address)
+
+        try:
+            resp = requests.head(self.address)
+            resp.raise_for_status()
+        except requests.RequestException as ex:
+            self.logger.debug("RequestException: %s", ex)
+            return False
+
+        self.logger.debug("[%s] is available : %s", self.name, resp.status_code)
+
+        return True
+
 
 class UnsafeWebsite(WebsiteTarget):
     """An unsafe website that should not be available."""
@@ -35,17 +52,12 @@ class UnsafeWebsite(WebsiteTarget):
     def check(self):
         """Verify HTTP connectivity is blocked to the website."""
 
-        self.logger.debug("verify [%s] => %s", self.name, self.address)
+        if self.is_available:
+            self.logger.warning("[%s] is not safe", self.name)
+            return False
 
-        try:
-            resp = requests.head(self.address)
-            resp.raise_for_status()
-        except requests.HTTPError:
-            self.logger.info("[%s] is safe", self.name)
-            return True
-
-        self.logger.warning("[%s] is not safe", self.name)
-        return False
+        self.logger.info("[%s] is safe", self.name)
+        return True
 
 
 class SafeWebsite(WebsiteTarget):
@@ -58,14 +70,9 @@ class SafeWebsite(WebsiteTarget):
     def check(self):
         """Verify HTTP connectivity is available to the website."""
 
-        self.logger.debug("verify [%s] => %s", self.name, self.address)
+        if self.is_available:
+            self.logger.info("[%s] is available", self.name)
+            return True
 
-        try:
-            resp = requests.head(self.address)
-            resp.raise_for_status()
-        except requests.HTTPError:
-            self.logger.warning("[%s] is not available", self.name)
-            return False
-
-        self.logger.info("[%s] is available", self.name)
-        return True
+        self.logger.warning("[%s] is not available", self.name)
+        return False
