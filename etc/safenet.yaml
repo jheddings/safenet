@@ -12,6 +12,13 @@ websites:
     safe: false
 
 
+systems:
+
+  - name: localhost
+    address: 127.0.0.1
+    safe: true
+
+
 logging:
   version: 1
 
