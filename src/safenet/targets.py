@@ -1,6 +1,7 @@
 """ Target module for safenet. """
 
 import logging
+import socket
 from abc import ABC, abstractmethod
 
 import ping3
@@ -153,13 +154,15 @@ class WebsiteTarget(BaseTarget, ABC):
         try:
             resp = requests.head(self.address, timeout=5)
             resp.raise_for_status()
+
+            self.logger.debug("[%s] is available : %s", self.name, resp.status_code)
+
+            return True
+
         except requests.RequestException as ex:
             self.logger.debug("RequestException: %s", ex)
-            return False
 
-        self.logger.debug("[%s] is available : %s", self.name, resp.status_code)
-
-        return True
+        return False
 
 
 class UnsafeWebsite(UnsafeTargetMixin, WebsiteTarget):
@@ -176,3 +179,74 @@ class SafeWebsite(SafeTargetMixin, WebsiteTarget):
     def __init__(self, name: str, address: str):
         super().__init__(name, address)
         self.logger = log.getChild("SafeWebsite")
+
+
+class NetworkTarget(BaseTarget, ABC):
+    """A target for TCP/IP network connectivity checks."""
+
+    def __init__(
+        self,
+        name: str,
+        address: str,
+        port: int,
+        source_ip: str = None,
+        timeout: int = 5,
+    ):
+        self.name = name
+        self.address = address
+        self.port = port
+        self.source_ip = source_ip
+        self.timeout = timeout
+
+        self.logger = log.getChild("NetworkTarget")
+
+    @property
+    def is_available(self):
+        """Determine if the specified network service is available."""
+
+        self.logger.debug(
+            "connect [%s] => %s:%d from %s",
+            self.name,
+            self.address,
+            self.port,
+            self.source_ip or "<default>",
+        )
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(self.timeout)
+
+        try:
+            if self.source_ip:
+                sock.bind((self.source_ip, 0))
+
+            sock.connect((self.address, self.port))
+            self.logger.debug("[%s] connection successful", self.name)
+
+            return True
+
+        except socket.timeout:
+            self.logger.debug("connection timeout: %s", self.name)
+
+        except OSError as err:
+            self.logger.debug("connection error: %s => %s", self.name, err)
+
+        finally:
+            sock.close()
+
+        return False
+
+
+class SafeNetworkTarget(SafeTargetMixin, NetworkTarget):
+    """A safe network target that should be available."""
+
+    def __init__(self, name: str, address: str, port: int, **kwargs):
+        super().__init__(name, address, port, **kwargs)
+        self.logger = log.getChild("SafeNetworkTarget")
+
+
+class UnsafeNetworkTarget(UnsafeTargetMixin, NetworkTarget):
+    """An unsafe network target that should not be available."""
+
+    def __init__(self, name: str, address: str, port: int, **kwargs):
+        super().__init__(name, address, port, **kwargs)
+        self.logger = log.getChild("UnsafeNetworkTarget")

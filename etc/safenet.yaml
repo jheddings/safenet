@@ -19,6 +19,14 @@ systems:
     safe: true
 
 
+networks:
+
+  - name: internet
+    address: 1.1.1.1
+    port: 53
+    safe: true
+
+
 logging:
   version: 1
 

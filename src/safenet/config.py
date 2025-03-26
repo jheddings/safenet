@@ -11,7 +11,14 @@ import os.path
 import yaml
 from pydantic import BaseModel
 
-from .targets import SafePingTarget, SafeWebsite, UnsafePingTarget, UnsafeWebsite
+from .targets import (
+    SafeNetworkTarget,
+    SafePingTarget,
+    SafeWebsite,
+    UnsafeNetworkTarget,
+    UnsafePingTarget,
+    UnsafeWebsite,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -51,11 +58,30 @@ class PingTargetConfig(BaseModel):
         return UnsafePingTarget(self.name, self.address, count=self.count)
 
 
+class NetworkTargetConfig(BaseModel):
+    """Configuration for network targets."""
+
+    name: str
+    address: str
+    port: int
+    safe: bool = False
+
+    def initialize(self):
+        """Initialize the network target for use."""
+        logger.info("initializing target: %s", self.name)
+
+        if self.safe:
+            return SafeNetworkTarget(self.name, self.address, self.port)
+
+        return UnsafeNetworkTarget(self.name, self.address, self.port)
+
+
 class AppConfig(BaseModel):
     """Application configuration for safenet."""
 
     websites: list[WebTargetConfig] = []
     systems: list[PingTargetConfig] = []
+    networks: list[NetworkTargetConfig] = []
 
     logging: dict | None = None
 

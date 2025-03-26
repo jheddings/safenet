@@ -41,6 +41,15 @@ class MainApp:
             if not ping.check():
                 failed += 1
 
+        self.logger.info("checking networks")
+        for target in self.config.networks:
+            self.logger.debug("checking target: %s", target.name)
+
+            net = target.initialize()
+
+            if not net.check():
+                failed += 1
+
         self.logger.info("scan complete")
 
         if failed > 0:
