@@ -23,18 +23,18 @@ class MainApp:
 
         failed = 0
 
-        self.logger.debug("checking websites")
+        self.logger.info("checking websites")
         for target in self.config.websites:
-            self.logger.info("checking target: %s", target.name)
+            self.logger.debug("checking target: %s", target.name)
 
             web = target.initialize()
 
             if not web.check():
                 failed += 1
 
-        self.logger.debug("checking systems")
+        self.logger.info("checking systems")
         for target in self.config.systems:
-            self.logger.info("checking target: %s", target.name)
+            self.logger.debug("checking target: %s", target.name)
 
             ping = target.initialize()
 
