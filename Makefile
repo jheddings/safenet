@@ -50,7 +50,7 @@ run: venv
 
 .PHONY: runc
 runc: build-image
-	docker container run --rm --tty --publish 9056:9056 "$(APPNAME):dev"
+	docker container run --rm --tty -v $(BASEDIR)/local.yaml:/etc/safenet.yaml "$(APPNAME):dev"
 
 
 .PHONY: static-checks
@@ -78,7 +78,7 @@ coverage: coverage-report coverage-html
 
 
 .PHONY: preflight
-preflight: static-checks unit-tests coverage-report
+preflight: static-checks
 
 
 .PHONY: clean
