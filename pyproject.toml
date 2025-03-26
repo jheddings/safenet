@@ -1,6 +1,6 @@
 [project]
 name = "safenet"
-version = "0.1.1"
+version = "0.1.2"
 description = "Scan explicit and malilcious sites to verify content filters."
 authors = [
     { name="jheddings", email="jheddings@gmail.com" }
