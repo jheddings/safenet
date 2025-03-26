@@ -151,7 +151,7 @@ class WebsiteTarget(BaseTarget, ABC):
         self.logger.debug("verify [%s] => %s", self.name, self.address)
 
         try:
-            resp = requests.head(self.address)
+            resp = requests.head(self.address, timeout=5)
             resp.raise_for_status()
         except requests.RequestException as ex:
             self.logger.debug("RequestException: %s", ex)
