@@ -69,13 +69,24 @@ class MainApp:
     prog_name=version.__pkgname__,
 )
 def main(config):
+    """
+    SafeNet - Network security validation tool.
+
+    This tool verifies network security configurations by checking connectivity
+    to various targets. It can verify that safe targets are accessible while
+    unsafe targets are properly blocked.
+
+    Example usage:
+      safenet run             Run network security checks with default config
+      safenet run -f my.yaml  Run checks with a custom config file
+      safenet --help          Show available commands and options
+    """
+
     cfg = AppConfig.load(config)
-
     app = MainApp(cfg)
-
     app()
 
 
-### MAIN ENTRY
+## MAIN ENTRY
 if __name__ == "__main__":
     main()

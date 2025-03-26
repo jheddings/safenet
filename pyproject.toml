@@ -13,7 +13,8 @@ dependencies = [
     "requests (>=2.32.3,<3.0.0)",
     "ping3 (>=4.0.8,<5.0.0)",
     "click (>=8.1.8,<9.0.0)",
-    "pyyaml (>=6.0.2,<7.0.0)"
+    "pyyaml (>=6.0.2,<7.0.0)",
+    "ifaddr (>=0.2.0,<0.3.0)"
 ]
 
 [tool.poetry.scripts]

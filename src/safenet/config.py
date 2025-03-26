@@ -11,6 +11,7 @@ import os.path
 import yaml
 from pydantic import BaseModel
 
+from . import util
 from .targets import (
     SafeNetworkTarget,
     SafePingTarget,
@@ -20,7 +21,7 @@ from .targets import (
     UnsafeWebsite,
 )
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class WebTargetConfig(BaseModel):
@@ -32,7 +33,7 @@ class WebTargetConfig(BaseModel):
 
     def initialize(self):
         """Initialize the web target for use."""
-        logger.info("initializing target: %s", self.name)
+        log.info("initializing target: %s", self.name)
 
         if self.safe:
             return SafeWebsite(self.name, self.address)
@@ -50,7 +51,7 @@ class PingTargetConfig(BaseModel):
 
     def initialize(self):
         """Initialize the ping target for use."""
-        logger.info("initializing target: %s", self.name)
+        log.info("initializing target: %s", self.name)
 
         if self.safe:
             return SafePingTarget(self.name, self.address, count=self.count)
@@ -64,16 +65,32 @@ class NetworkTargetConfig(BaseModel):
     name: str
     address: str
     port: int
+    network: str = None
     safe: bool = False
 
     def initialize(self):
         """Initialize the network target for use."""
-        logger.info("initializing target: %s", self.name)
+        log.info("initializing target: %s", self.name)
+
+        source_ip = None
+
+        if self.network is not None:
+            source_ip = util.get_device_ip(self.network)
 
         if self.safe:
-            return SafeNetworkTarget(self.name, self.address, self.port)
+            return SafeNetworkTarget(
+                self.name,
+                self.address,
+                self.port,
+                source_ip=source_ip,
+            )
 
-        return UnsafeNetworkTarget(self.name, self.address, self.port)
+        return UnsafeNetworkTarget(
+            self.name,
+            self.address,
+            self.port,
+            source_ip=source_ip,
+        )
 
 
 class AppConfig(BaseModel):

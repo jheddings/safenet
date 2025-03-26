@@ -22,6 +22,7 @@ systems:
 networks:
 
   - name: internet
+    network: 10.0.0.0/24
     address: 1.1.1.1
     port: 53
     safe: true
