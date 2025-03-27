@@ -9,7 +9,7 @@ import os
 import os.path
 
 import yaml
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 from . import util
 from .targets import (
@@ -68,28 +68,37 @@ class NetworkTargetConfig(BaseModel):
     network: str = None
     safe: bool = False
 
+    @field_validator("network")
+    @classmethod
+    def validate_network(cls, v, values):
+        """Validate the network and determine the source IP if needed."""
+        if v is None:
+            return v
+
+        source_ip = util.get_device_ip(v)
+
+        if source_ip is None:
+            raise ValueError(f"Unable to determine IP address for network: {v}")
+
+        return source_ip
+
     def initialize(self):
         """Initialize the network target for use."""
         log.info("initializing target: %s", self.name)
-
-        source_ip = None
-
-        if self.network is not None:
-            source_ip = util.get_device_ip(self.network)
 
         if self.safe:
             return SafeNetworkTarget(
                 self.name,
                 self.address,
                 self.port,
-                source_ip=source_ip,
+                source_ip=self.network,
             )
 
         return UnsafeNetworkTarget(
             self.name,
             self.address,
             self.port,
-            source_ip=source_ip,
+            source_ip=self.network,
         )
 
 

@@ -21,7 +21,10 @@ class BaseTarget(ABC):
 
 
 class SafeTargetMixin:
-    """Mixin for targets that should be available."""
+    """Mixin for targets that should be available.
+
+    The target must define an `is_available` property for this mixin.
+    """
 
     def check(self):
         """Verify connectivity is available to the target."""
@@ -34,7 +37,10 @@ class SafeTargetMixin:
 
 
 class UnsafeTargetMixin:
-    """Mixin for targets that should not be available."""
+    """Mixin for targets that should not be available.
+
+    The target must define an `is_available` property for this mixin.
+    """
 
     def check(self):
         """Verify connectivity is blocked to the target."""
@@ -215,10 +221,10 @@ class NetworkTarget(BaseTarget, ABC):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(self.timeout)
 
-        try:
-            if self.source_ip:
-                sock.bind((self.source_ip, 0))
+        if self.source_ip:
+            sock.bind((self.source_ip, 0))
 
+        try:
             sock.connect((self.address, self.port))
             self.logger.debug("[%s] connection successful", self.name)
 
