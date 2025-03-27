@@ -74,7 +74,7 @@ class PingTarget(BaseTarget, ABC):
         self.logger = log.getChild("PingTarget")
 
     @property
-    def is_available(self):
+    def is_available(self) -> bool:
         """Determine if the specified system is available."""
 
         self.logger.debug("ping [%s] => %s", self.name, self.address)
@@ -152,7 +152,7 @@ class WebsiteTarget(BaseTarget, ABC):
         self.logger = log.getChild("WebsiteTarget")
 
     @property
-    def is_available(self):
+    def is_available(self) -> bool:
         """Determine if the specified website is available."""
 
         self.logger.debug("verify [%s] => %s", self.name, self.address)
@@ -207,7 +207,7 @@ class NetworkTarget(BaseTarget, ABC):
         self.logger = log.getChild("NetworkTarget")
 
     @property
-    def is_available(self):
+    def is_available(self) -> bool:
         """Determine if the specified network service is available."""
 
         self.logger.debug(
