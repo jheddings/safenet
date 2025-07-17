@@ -23,7 +23,7 @@ safenet = "safenet.__main__:main"
 [tool.poetry.group.dev.dependencies]
 gitpython = "^3.1.44"
 pre-commit = "^4.2.0"
-ruff = "^0.12.3"
+ruff = "^0.12.4"
 black = "^25.1.0"
 isort = "^6.0.1"
 pytest = "^8.4.1"
