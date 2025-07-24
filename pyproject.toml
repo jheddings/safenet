@@ -21,7 +21,7 @@ dependencies = [
 safenet = "safenet.__main__:main"
 
 [tool.poetry.group.dev.dependencies]
-gitpython = "^3.1.44"
+gitpython = "^3.1.45"
 pre-commit = "^4.2.0"
 ruff = "^0.12.4"
 black = "^25.1.0"
