@@ -27,7 +27,7 @@ ruff = "^0.12.6"
 black = "^25.1.0"
 isort = "^6.0.1"
 pytest = "^8.4.1"
-coverage = "^7.10.1"
+coverage = "^7.10.6"
 
 [tool.black]
 line_length = 88
