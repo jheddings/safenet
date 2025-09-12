@@ -1,5 +1,6 @@
 package target
 
 type Target interface {
-	Check() bool
+	GetName() string
+	Check() (bool, error)
 }
