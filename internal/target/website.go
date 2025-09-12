@@ -22,13 +22,10 @@ func (t *WebsiteTarget) Check() (bool, error) {
 	log.Debug().Str("name", t.Name).Str("address", t.Address).Bool("safe", t.Safe).Msg("checking website")
 
 	available, err := t.isAvailable()
-	if err != nil {
-		return false, err
-	}
 
 	// for safe websites: return true if available
 	// for unsafe websites: return true if unavailable
-	return t.Safe == available, nil
+	return t.Safe == available, err
 }
 
 // determine if the website is available
@@ -40,12 +37,16 @@ func (t *WebsiteTarget) isAvailable() (bool, error) {
 		defer resp.Body.Close()
 	}
 
-	if err != nil {
-		return false, err
+	if err == nil {
+		return isHttpStatusOk(resp), nil
 	}
 
-	if isHttpStatusOk(resp) {
-		return true, nil
+	// the error may be expected if the website is unsafe; e.g. blocked by a firewall
+	// or other network settings - adjust our return value accordingly
+	log.Debug().Err(err).Str("url", t.Address).Bool("safe", t.Safe).Msg("website error")
+
+	if t.Safe {
+		return false, err
 	}
 
 	return false, nil
@@ -53,5 +54,9 @@ func (t *WebsiteTarget) isAvailable() (bool, error) {
 
 // determine if the response is a valid HTTP status
 func isHttpStatusOk(resp *http.Response) bool {
+	if resp == nil {
+		return false
+	}
+
 	return resp.StatusCode >= 200 && resp.StatusCode < 400
 }
