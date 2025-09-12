@@ -1,11 +1,25 @@
-FROM python:3.13
+# Builder stage - build the safenet application
+FROM golang:1.25 AS builder
 
-COPY src poetry.lock pyproject.toml README.md /tmp/safenet/
-RUN pip3 install /tmp/safenet/ && rm -Rf /tmp/safenet
+WORKDIR /app
+COPY go.mod go.sum main.go ./
+COPY internal/ ./internal/
+
+# Build the application
+RUN go mod download
+
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /tmp/safenet .
+
+
+# Final stage - start with a scratch image to include only the application
+FROM scratch
+
+# install the safenet utility
+COPY --from=builder /tmp/safenet /usr/local/bin/safenet
 
 # commands must be presented as an array, otherwise it will be launched
-# using a shell, which causes problems handling signals for shutdown (#15)
-ENTRYPOINT ["python3", "-m", "safenet"]
+# using a shell, which causes problems handling signals for shutdown
+ENTRYPOINT ["/usr/local/bin/safenet"]
 
-# allow local callers to change the config file
-CMD ["--config=/etc/safenet.yaml"]
+# require callers to specify a command
+CMD ["--help"]

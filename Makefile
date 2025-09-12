@@ -1,40 +1,46 @@
 # Makefile for safenet
 
 BASEDIR ?= $(PWD)
-SRCDIR ?= $(BASEDIR)/src
+SRCDIR ?= $(BASEDIR)
+DISTDIR ?= $(BASEDIR)/dist
 
-APPNAME ?= $(shell grep -m1 '^name' "$(BASEDIR)/pyproject.toml" | sed -e 's/name.*"\(.*\)"/\1/')
-APPVER ?= $(shell grep -m1 '^version' "$(BASEDIR)/pyproject.toml" | sed -e 's/version.*"\(.*\)"/\1/')
+APPNAME ?= safenet
+APPVER ?= 0.3.0
 
-WITH_VENV := poetry run
+GOOS ?= $(shell go env GOOS)
+GOARCH ?= $(shell go env GOARCH)
+
+APPEXE = $(APPNAME)-cli
+ifeq ($(GOOS),windows)
+	APPEXE = $(APPNAME)-cli.exe
+endif
 
 
 .PHONY: all
-all: venv preflight build
+all: init preflight build
 
-
-.PHONY: venv
-venv:
-	poetry sync --with dev --no-interaction
-	$(WITH_VENV) pre-commit install --install-hooks --overwrite
-
-
-poetry.lock: venv
-	poetry lock --no-interaction
-
-
-.PHONY: build-dist
-build-dist: preflight
-	poetry build --no-interaction
-
-
-.PHONY: build-image
-build-image: preflight
-	docker image build --tag "$(APPNAME):dev" "$(BASEDIR)"
+.PHONY: init
+init:
+	cd $(SRCDIR) && go mod download
+	cd $(SRCDIR) && go mod tidy
 
 
 .PHONY: build
-build: build-dist build-image
+build: build-exe build-image
+
+
+.PHONY: build-exe
+build-exe: init
+	mkdir -p $(DISTDIR)
+	cd $(SRCDIR) && \
+	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build \
+		-ldflags "-X main.version=$(APPVER) -s -w" \
+		-o $(DISTDIR)/$(APPEXE)
+
+
+.PHONY: build-image
+build-image: init
+	docker image build --tag "$(APPNAME):dev" "$(BASEDIR)"
 
 
 .PHONY: release
@@ -44,8 +50,8 @@ release: preflight
 
 
 .PHONY: run
-run: venv
-	$(WITH_VENV) python3 -m safenet --config $(BASEDIR)/local.yaml
+run: init
+	cd $(SRCDIR) && go run main.go --config $(BASEDIR)/local.yaml
 
 
 .PHONY: runc
@@ -53,28 +59,17 @@ runc: build-image
 	docker container run --rm --tty -v $(BASEDIR)/local.yaml:/etc/safenet.yaml "$(APPNAME):dev"
 
 
+.PHONY: lint
+lint:
+
+
+.PHONY: style
+style:
+	cd $(SRCDIR) && go fmt
+
+
 .PHONY: static-checks
-static-checks: venv
-	$(WITH_VENV) pre-commit run --all-files --verbose
-
-
-.PHONY: unit-tests
-unit-tests: venv
-	$(WITH_VENV) coverage run "--source=$(SRCDIR)" -m pytest "$(BASEDIR)/tests"
-
-
-.PHONY: coverage-report
-coverage-report: venv unit-tests
-	$(WITH_VENV) coverage report
-
-
-.PHONY: coverage-html
-coverage-html: venv unit-tests
-	$(WITH_VENV) coverage html
-
-
-.PHONY: coverage
-coverage: coverage-report coverage-html
+static-checks: style lint
 
 
 .PHONY: preflight
@@ -83,18 +78,10 @@ preflight: static-checks
 
 .PHONY: clean
 clean:
-	rm -f "$(BASEDIR)/.coverage"
-	rm -Rf "$(BASEDIR)/.pytest_cache"
-	find "$(BASEDIR)" -name "*.pyc" -print | xargs rm -f
-	find "$(BASEDIR)" -name '__pycache__' -print | xargs rm -Rf
-	docker image rm "$(APPNAME):dev" 2>/dev/null || true
+	cd $(SRCDIR) && go clean
 
 
 .PHONY: clobber
 clobber: clean
-	$(WITH_VENV) pre-commit uninstall || true
-	rm -Rf "$(BASEDIR)/htmlcov"
-	rm -Rf "$(BASEDIR)/dist"
-	poetry env remove --all --no-interaction
-	docker image rm "$(APPNAME):latest" 2>/dev/null || true
-	docker image rm "$(APPNAME):$(APPVER)" 2>/dev/null || true
+	rm -Rf "$(SRCDIR)/dist"
+	cd $(SRCDIR) && go clean -modcache

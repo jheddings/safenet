@@ -4,15 +4,7 @@
 *~
 .DS_Store
 
-__pycache__
-*.py[cod]
-*.prof
-.coverage
-
-.pytest_cache
-.ruff_cache
-
-.venv
+safenet
 
 local.env
 local.yaml
@@ -20,5 +12,3 @@ local.yaml
 dist
 lib
 tmp
-site
-htmlcov
