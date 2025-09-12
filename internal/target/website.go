@@ -26,11 +26,9 @@ func (t *WebsiteTarget) Check() (bool, error) {
 		return false, err
 	}
 
-	if t.Safe {
-		return available, nil
-	}
-
-	return !available, nil
+	// for safe websites: return true if available
+	// for unsafe websites: return true if unavailable
+	return t.Safe == available, nil
 }
 
 // determine if the website is available
