@@ -14,6 +14,9 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /tmp/safenet .
 # Final stage - start with a scratch image to include only the application
 FROM scratch
 
+# copy CA certificates for HTTPS requests
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+
 # install the safenet utility
 COPY --from=builder /tmp/safenet /usr/local/bin/safenet
 
