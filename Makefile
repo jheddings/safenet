@@ -51,12 +51,14 @@ release: preflight
 
 .PHONY: run
 run: init
-	cd $(SRCDIR) && go run main.go --config $(BASEDIR)/local.yaml
+	cd $(SRCDIR) && go run main.go check
 
 
 .PHONY: runc
 runc: build-image
-	docker container run --rm --tty -v $(BASEDIR)/local.yaml:/etc/safenet.yaml "$(APPNAME):dev"
+	docker container run --rm --tty --network=host \
+		-v $(BASEDIR)/safenet.yaml:/safenet.yaml \
+		"$(APPNAME):dev" check
 
 
 .PHONY: lint
