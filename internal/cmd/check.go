@@ -29,18 +29,18 @@ func init() {
 
 func doRun(cmd *cobra.Command, args []string) {
 
-	// check all websites
-	for _, website := range cfg.Websites {
-		checkTarget(&website)
-	}
+	// TODO add flags to disable specific target types (e.g. --no-websites, --no-systems, --no-networks)
+
+	/*
+		// check all websites
+		for _, website := range cfg.Websites {
+			checkTarget(&website)
+		}
+	*/
 
 	// Example: Print all system targets
 	for _, system := range cfg.Systems {
-		log.Debug().
-			Str("name", system.Name).
-			Str("address", system.Address).
-			Bool("safe", system.Safe).
-			Msg("System target")
+		checkTarget(&system)
 	}
 
 	// Example: Print all network targets

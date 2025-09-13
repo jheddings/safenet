@@ -30,6 +30,8 @@ func (t *WebsiteTarget) Check() (bool, error) {
 
 // determine if the website is available
 func (t *WebsiteTarget) isAvailable() (bool, error) {
+	log.Trace().Str("url", t.Address).Msg("GET")
+
 	resp, err := http.Get(t.Address)
 
 	if resp != nil {
