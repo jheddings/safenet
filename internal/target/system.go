@@ -1,6 +1,8 @@
 package target
 
 import (
+	"time"
+
 	probing "github.com/prometheus-community/pro-bing"
 	"github.com/rs/zerolog/log"
 )
@@ -37,7 +39,12 @@ func (t *SystemTarget) isAvailable() (bool, error) {
 		return false, err
 	}
 
+	// XXX make these configurable?
 	pinger.Count = 3
+	pinger.TTL = 64
+	pinger.Size = 56
+	pinger.Timeout = 5 * time.Second
+
 	err = pinger.Run()
 	if err != nil {
 		log.Error().Err(err).Str("name", t.Name).Msg("error running pinger")
