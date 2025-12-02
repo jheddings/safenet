@@ -1,6 +1,6 @@
 module github.com/jheddings/safenet
 
-go 1.25.4
+go 1.25.5
 
 require (
 	github.com/prometheus-community/pro-bing v0.7.0
