@@ -3,7 +3,7 @@ module github.com/jheddings/safenet
 go 1.25.7
 
 require (
-	github.com/prometheus-community/pro-bing v0.7.0
+	github.com/prometheus-community/pro-bing v0.8.0
 	github.com/pterm/pterm v0.12.82
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.10.2
