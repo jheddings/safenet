@@ -4,7 +4,7 @@ go 1.26.6
 
 require (
 	github.com/prometheus-community/pro-bing v0.9.1
-	github.com/pterm/pterm v0.12.83
+	github.com/pterm/pterm v0.12.84
 	github.com/rs/zerolog v1.35.1
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
